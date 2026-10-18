@@ -1,0 +1,1240 @@
+﻿<script src="markdown-lite.js"></script>
+<script src="jzw_crypto.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "微软雅黑", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: #333;
+    line-height: 1.6;
+  }
+  a { text-decoration: none; color: inherit; }
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  button:focus, button:active, button:hover,
+  a:focus, a:active, a:hover {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* ===== 顶部导航 ===== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .hamburger {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    background: none;
+    border: none;
+    line-height: 1;
+  }
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fc6832;
+  }
+  .topbar-logo .logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: block;
+    object-fit: contain;
+  }
+
+  /* ===== 中考倒计时横幅 ===== */
+  .zk-banner {
+    display: none;
+    width: 100%;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    box-sizing: border-box;
+  }
+  .zk-banner .zk-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .zk-banner .zk-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  #zkIconL { background: #fc6832; color: #fff; }
+  #zkIconR { background: #0066cc; color: #fff; }
+  .zk-banner .zk-icon svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+  }
+  .zk-banner .zk-text {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    white-space: nowrap;
+    text-align: center;
+  }
+  /* 阶段配色：>2年绿 / 1~2年黄 / 1~12个月橙 / <1个月红 / 考试期间白 */
+  .zk-banner.zk-green  { background: #a8e6cf; color: #0f5132; }
+  .zk-banner.zk-yellow { background: #ffe066; color: #6b5300; }
+  .zk-banner.zk-orange { background: #ff9f43; color: #4d2600; }
+  .zk-banner.zk-red    { background: #e03131; color: #ffffff; }
+  .zk-banner.zk-exam   { background: #ffffff; color: #333333; border-bottom: 1px solid #eee; }
+
+  @media (max-width: 768px) {
+    .zk-banner { padding: 7px 10px; }
+    .zk-banner .zk-text { font-size: 13px; white-space: normal; }
+    .zk-banner .zk-icon { width: 20px; height: 20px; }
+    .zk-banner .zk-icon svg { width: 12px; height: 12px; }
+  }
+
+  /* 侧边导航 */
+  .side-nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
+  }
+  .side-nav-overlay.open { display: block; }
+  .side-nav {
+    position: fixed;
+    top: 0; left: -280px;
+    width: 280px;
+    height: 100%;
+    background: #fff;
+    z-index: 2001;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+    overflow-y: auto;
+  }
+  .side-nav.open { left: 0; }
+  .side-nav-header {
+    padding: 24px 20px;
+    background: linear-gradient(135deg, #fc6832, #ff8c5a);
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .side-nav ul { list-style: none; padding: 12px 0; }
+  .side-nav li a {
+    display: block;
+    padding: 14px 24px;
+    color: #333;
+    font-size: 15px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .side-nav li a:hover {
+    background: #fff5f0;
+    color: #fc6832;
+    padding-left: 30px;
+  }
+  .side-nav li a.write-link {
+    color: #fc6832;
+    font-weight: 600;
+  }
+
+  /* ===== 页面容器 ===== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== Hero 欢迎区 ===== */
+  .hero {
+    text-align: center;
+    padding: 60px 20px 30px;
+  }
+  .hero-title {
+    font-size: 72px;
+    font-weight: 900;
+    color: #1a1a1a;
+    line-height: 1.2;
+    letter-spacing: 2px;
+  }
+  .hero-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: #0066cc;
+    text-decoration: underline;
+    font-size: 16px;
+  }
+  .hero-link:hover { color: #fc6832; }
+
+  /* ===== 特性网格 2x2 ===== */
+  .features {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .feature-item {
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 16px;
+    color: #666;
+  }
+
+  /* ===== 联系方式 ===== */
+  .contact-section {
+    text-align: center;
+    padding: 30px 20px 50px;
+  }
+  .contact-title {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: normal;
+  }
+  .contact-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    margin: 0 auto 16px;
+    display: block;
+    object-fit: cover;
+  }
+  .contact-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+  }
+  .contact-info p {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.9;
+  }
+  .contact-other {
+    max-width: 500px;
+    margin: 12px auto 0;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+  }
+
+  /* ===== 橙色按钮区 ===== */
+  .btn-section {
+    text-align: center;
+    padding: 20px 20px 10px;
+  }
+  .orange-btn {
+    display: inline-block;
+    background: #fc6832;
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .orange-btn:hover { background: #e55a28; }
+  .orange-btn.long {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 25px;
+    padding: 14px 20px;
+    margin: 0 auto;
+  }
+  .btn-note {
+    text-align: center;
+    font-size: 24px;
+    color: #353535;
+    margin: 16px 0;
+  }
+  .btn-note.small { font-size: 16px; color: #666; }
+
+  /* 占位网格 */
+  .placeholder-grid {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .placeholder-item {
+    text-align: center;
+    padding: 20px;
+    font-size: 15px;
+    color: #999;
+  }
+  .placeholder-item .null-text {
+    color: #ccc;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .placeholder-center-img {
+    width: 60px;
+    height: 60px;
+    background: #f5f5f5;
+    margin: 0 auto;
+  }
+
+  /* ===== 分隔标题 ===== */
+  .section-divider {
+    text-align: center;
+    padding: 50px 20px 20px;
+    font-size: 22px;
+    color: #bbb;
+    font-weight: normal;
+  }
+
+  /* ===== 文章列表 ===== */
+  .article-list {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px 30px;
+  }
+  .article-item {
+    padding: 24px 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .article-item:hover { background: #fafafa; }
+  .article-item h3 {
+    font-size: 18px;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .article-item .summary {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .article-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #999;
+  }
+  .article-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+  }
+
+  /* ===== 文章分类 Tab 通栏 ===== */
+  .article-tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 6px;
+  }
+  .article-search {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    width: 180px;
+    transition: border-color 0.2s;
+  }
+  .article-search:focus { border-color: #fc6832; }
+  .article-tab {
+    padding: 12px 4px;
+    margin-right: 32px;
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    position: relative;
+    background: none;
+    border: none;
+    font-family: inherit;
+    transition: color 0.2s;
+  }
+  .article-tab.active {
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+  .article-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #0066cc;
+    border-radius: 2px;
+  }
+  .article-tag + .article-tag { margin-left: 6px; }
+
+  /* ===== 更多功能提示 ===== */
+  .more-features {
+    text-align: center;
+    padding: 40px 20px 50px;
+    font-size: 20px;
+    color: #333;
+  }
+
+  /* ===== 页脚 ===== */
+  .footer {
+    background: #f8f8f8;
+    padding: 40px 20px 30px;
+    text-align: center;
+    border-top: 1px solid #eee;
+  }
+  .footer-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 16px;
+    font-weight: bold;
+  }
+  .footer-links {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #999;
+  }
+  .footer-links a {
+    color: #999;
+    margin: 0 20px;
+  }
+  .footer-info {
+    font-size: 13px;
+    color: #999;
+    line-height: 2;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .footer-copyright {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #bbb;
+  }
+
+  /* ===== 文章详情页 ===== */
+  .article-detail-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+  .back-link {
+    display: inline-block;
+    color: #fc6832;
+    font-size: 14px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .article-detail h1 {
+    font-size: 28px;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .article-detail .meta {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  .article-body { font-size: 15px; line-height: 1.85; color: #333; }
+  .article-body h1, .article-body h2, .article-body h3 {
+    margin: 24px 0 12px;
+    color: #1a1a1a;
+  }
+  .article-body h2 { font-size: 22px; }
+  .article-body h3 { font-size: 18px; }
+  .article-body p { margin: 12px 0; }
+  .article-body img {
+    max-width: 100%;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .article-body code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #e55a28;
+  }
+  .article-body pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .article-body pre code { background: none; color: inherit; padding: 0; }
+  .article-body blockquote {
+    border-left: 4px solid #fc6832;
+    background: #fff5f0;
+    padding: 10px 16px;
+    margin: 16px 0;
+    color: #666;
+    border-radius: 0 4px 4px 0;
+  }
+  .article-body ul, .article-body ol { margin: 12px 0; padding-left: 28px; }
+  .article-body li { margin: 6px 0; }
+  .article-body a { color: #fc6832; text-decoration: underline; }
+  .article-body table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  .article-body th, .article-body td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  .article-body th { background: #f5f5f5; }
+
+  /* ===== 写文章页面 ===== */
+  .write-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+  .write-page h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
+    color: #1a1a1a;
+  }
+  .write-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .write-toolbar input {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+  }
+  .write-toolbar input:focus { border-color: #fc6832; }
+  .write-toolbar input[type="text"] { flex: 1; min-width: 200px; }
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: #fc6832; color: #fff; }
+  .btn-primary:hover { background: #e55a28; }
+  .btn-secondary { background: #f0f0f0; color: #666; }
+  .btn-secondary:hover { background: #e0e0e0; }
+  .write-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    height: 500px;
+  }
+  .write-panel {
+    border: 1px solid #eee;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .write-panel-header {
+    padding: 10px 16px;
+    background: #f8f8f8;
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+  }
+  .write-panel-body { flex: 1; overflow: auto; padding: 16px; }
+  #mdEditor {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #333;
+  }
+  .code-output {
+    margin-top: 16px;
+    background: #2d2d2d;
+    color: #a8e6cf;
+    padding: 16px;
+    border-radius: 6px;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: none;
+    max-height: 300px;
+    overflow: auto;
+  }
+  .code-output.show { display: block; }
+
+  /* ===== 横幅轮播 ===== */
+  .banner {
+    width: 100%;
+    max-height: 360px;
+    overflow: hidden;
+    position: relative;
+    background: #f0f0f0;
+  }
+  .banner-slides {
+    display: flex;
+    transition: transform 0.6s ease;
+    width: 100%;
+  }
+  .banner-slide {
+    min-width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    display: block;
+  }
+  .banner-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .banner-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .banner-dot.active { background: #fc6832; }
+
+  /* ===== 投稿 / 解密 通用页面 ===== */
+  .tool-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+  .tool-page h2 {
+    font-size: 22px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  .tool-page .subtitle {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .tool-form {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .tool-form label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+    margin-top: 14px;
+    font-weight: 600;
+  }
+  .tool-form label:first-child { margin-top: 0; }
+  .tool-form input, .tool-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .tool-form input:focus, .tool-form textarea:focus { border-color: #fc6832; }
+  .tool-form textarea {
+    min-height: 200px;
+    resize: vertical;
+    font-family: Consolas, Monaco, monospace;
+    line-height: 1.6;
+  }
+  .tool-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .result-box {
+    background: #2d2d2d;
+    color: #a8e6cf;
+    padding: 16px;
+    border-radius: 6px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 300px;
+    overflow: auto;
+    display: none;
+    margin-top: 16px;
+  }
+  .result-box.show { display: block; }
+  .email-hint {
+    background: #fff5f0;
+    border: 1px solid #fc6832;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+  }
+  .email-hint strong { color: #fc6832; }
+  .preview-box {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 16px;
+    display: none;
+  }
+  .preview-box.show { display: block; }
+  .preview-box h3 {
+    font-size: 20px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  .preview-box .meta {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 16px;
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 768px) {
+    .hero-title { font-size: 40px; }
+    .features { grid-template-columns: 1fr; }
+    .placeholder-grid { grid-template-columns: 1fr; }
+    .write-layout { grid-template-columns: 1fr; height: auto; }
+    .write-panel { min-height: 350px; }
+    .article-detail h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 中考倒计时横幅（zk_countdown.js 控制，考试结束自动隐藏） -->
+<div class="zk-banner" id="zkBanner">
+  <span class="zk-inner">
+    <span class="zk-text" id="zkText">倒计时加载中...</span>
+  </span>
+</div>
+
+<!-- 顶部导航 -->
+<div class="topbar">
+  <button class="hamburger" onclick="toggleNav()">点我到菜单</button>
+  <div class="topbar-logo">
+    <img class="logo-icon" src="images/10001.png" alt="焦梓睿的个人网站">
+    <span>焦梓睿的个人网站</span>
+  </div>
+</div>
+
+<!-- 侧边导航遮罩 -->
+<div class="side-nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+
+<!-- 侧边导航 -->
+<div class="side-nav" id="sideNav">
+  <div class="side-nav-header">焦梓睿的个人网站</div>
+  <ul>
+    <li><a onclick="navigate('home');toggleNav()">首页</a></li>
+    <li><a onclick="navigate('articles');toggleNav()">校园动态</a></li>
+    <li><a onclick="navigate('message');toggleNav()">留言板</a></li>
+    <li><a onclick="navigate('about');toggleNav()">关于梓睿</a></li>
+  </ul>
+</div>
+
+<!-- ==================== 首页 ==================== -->
+<div class="page active" id="page-home">
+
+  <!-- 横幅轮播 -->
+  <div class="banner" id="banner" style="display:none;">
+    <div class="banner-slides" id="bannerSlides"></div>
+    <div class="banner-dots" id="bannerDots"></div>
+  </div>
+
+  <!-- Hero 欢迎区 -->
+  <div class="hero">
+    <div class="hero-title">欢迎来到</div>
+    <div class="hero-title">焦梓睿的个人网站！</div>
+    <a class="hero-link" href="https://riliwuhou.de5.net" target="_blank">小香蕉官网：小香蕉助手 - 版本</a>
+  </div>
+
+  <!-- 特性 2x2 -->
+  <div class="features">
+    <div class="feature-item">回答可靠，无须担心内容出错</div>
+    <div class="feature-item">超大知识库，可回答1000+个问题</div>
+    <div class="feature-item">简介界面，无须担心臃肿占内存</div>
+    <div class="feature-item">支持代码高亮显示等现代化功能</div>
+  </div>
+
+  <!-- 联系方式 -->
+  <div class="contact-section">
+    <div class="contact-title">联系方式</div>
+    <img class="contact-avatar" src="images/avatar.png" alt="焦梓睿" onerror="this.style.background='#a8e6cf';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23a8e6cf%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2260%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%23fff%22>焦</text></svg>'">
+    <div class="contact-name">焦梓睿</div>
+    <div class="contact-info">
+      <p>电话：13486457294</p>
+      <p>邮箱：zirui@goodemail.de5.net</p>
+      <p>QQ：19626733</p>
+    </div>
+  </div>
+
+  <!-- 联系焦梓睿按钮 -->
+  <div class="btn-section">
+    <button class="orange-btn" onclick="navigate('contact')">联系焦梓睿</button>
+    <div class="btn-note small">点击前往问卷星联系表单</div>
+  </div>
+
+  <!-- 催更按钮 -->
+  <div class="btn-section" style="padding:20px 20px 10px;">
+    <button class="orange-btn long" onclick="navigate('message')">催更</button>
+    <div class="btn-note small">点击前往问卷星留言板</div>
+  </div>
+
+  <!-- 占位网格 -->
+  <div class="placeholder-grid">
+    <div class="placeholder-item">
+      无法获取该内容
+      <div class="null-text">null</div>
+    </div>
+    <div class="placeholder-item">
+      <div class="placeholder-center-img"></div>
+    </div>
+    <div class="placeholder-item">
+      无法获取该内容
+      <div class="null-text">null</div>
+    </div>
+    <div class="placeholder-item">
+      无法获取该内容
+      <div class="null-text">null</div>
+    </div>
+  </div>
+
+  <!-- 分隔标题 -->
+  <div class="section-divider">展示自我与分享日常</div>
+
+  <!-- 文章列表 -->
+  <div class="article-list" id="homeArticleList"></div>
+
+  <!-- 更多功能 -->
+  <div class="more-features">更多功能，马上上线！！！</div>
+
+</div>
+
+<!-- ==================== 文章列表页 ==================== -->
+<div class="page" id="page-articles">
+  <div class="article-list" style="padding-top:30px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <h2 style="font-size:22px;color:#1a1a1a;margin:0;">校园动态</h2>
+        <input type="text" id="articleSearch" class="article-search" placeholder="搜索标题或内容..." oninput="renderFullArticles()">
+      </div>
+      <button class="btn btn-primary" onclick="navigate('submit')">我要投稿</button>
+    </div>
+    <div class="article-tabs">
+      <div style="display:flex;">
+        <button class="article-tab active" data-tab="official" onclick="switchArticleTab('official')">官方</button>
+        <button class="article-tab" data-tab="submission" onclick="switchArticleTab('submission')">投稿</button>
+      </div>
+    </div>
+    <div id="fullArticleList"></div>
+  </div>
+</div>
+
+<!-- ==================== 文章详情页 ==================== -->
+<div class="page" id="page-article-detail">
+  <div class="article-detail-page">
+    <a class="back-link" onclick="navigate('articles')">← 返回文章列表</a>
+    <div class="article-detail" id="articleDetail"></div>
+  </div>
+</div>
+
+<!-- ==================== 联系我（问卷星） ==================== -->
+<div class="page" id="page-contact">
+  <div style="text-align:center;padding:80px 20px;">
+    <div style="font-size:48px;margin-bottom:20px;"></div>
+    <h2 style="font-size:24px;margin-bottom:12px;color:#1a1a1a;">联系焦梓睿</h2>
+    <p style="color:#999;margin-bottom:30px;">点击下方按钮，填写问卷星表单与我取得联系</p>
+    <a class="orange-btn" href="https://v.wjx.cn/vm/YNC6Hve.aspx" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;">前往填写联系表单</a>
+    <div style="margin-top:30px;font-size:13px;color:#bbb;max-width:500px;margin-left:auto;margin-right:auto;background:#fafafa;padding:12px 16px;border-radius:4px;">
+      表单由问卷星提供，填写后即可提交。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 留言板（问卷星） ==================== -->
+<div class="page" id="page-message">
+  <div style="text-align:center;padding:80px 20px;">
+    <div style="font-size:48px;margin-bottom:20px;"></div>
+    <h2 style="font-size:24px;margin-bottom:12px;color:#1a1a1a;">留言板</h2>
+    <p style="color:#999;margin-bottom:30px;">欢迎留下你的足迹，点击下方按钮前往留言</p>
+    <a class="orange-btn" href="https://v.wjx.cn/vm/YNC6Hve.aspx" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;">我要留言</a>
+    <div style="margin-top:30px;font-size:13px;color:#bbb;max-width:500px;margin-left:auto;margin-right:auto;background:#fafafa;padding:12px 16px;border-radius:4px;">
+      表单由问卷星提供，欢迎留下你的留言。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 关于梓睿 ==================== -->
+<div class="page" id="page-about">
+  <div class="article-detail-page">
+    <div class="article-detail">
+      <h1>关于梓睿</h1>
+      <div class="meta">个人介绍</div>
+      <div class="article-body">
+        <p>你好，我是<strong>焦梓睿</strong>，欢迎来到我的个人网站！</p>
+        <p>这个网站用于展示自我、分享日常，记录生活中的点点滴滴。</p>
+        <h2>联系方式</h2>
+        <ul>
+          <li>电话：13486457294</li>
+          <li>微信：13709814127</li>
+          <li>QQ：19626733</li>
+          <li>邮箱：zirui@goodemail.de5.net</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 我要投稿 ==================== -->
+<div class="page" id="page-submit">
+  <div class="tool-page">
+    <h2>我要投稿</h2>
+    <p class="subtitle">填写文章内容，生成加密文本后发送到指定邮箱即可完成投稿</p>
+
+    <div class="tool-form">
+      <label>文章标题</label>
+      <input type="text" id="submitTitle" placeholder="请输入文章标题">
+
+      <label>日期</label>
+      <input type="text" id="submitDate" placeholder="如 2025-05-01">
+
+      <label>文章内容（支持 Markdown / HTML）</label>
+      <textarea id="submitContent" placeholder="在这里写文章内容，支持 Markdown 语法和 HTML 标签..."></textarea>
+
+      <label>投稿人昵称（可选）</label>
+      <input type="text" id="submitAuthor" placeholder="你的昵称">
+
+      <div style="margin-top:16px;padding:12px;background:#f9f9f9;border-radius:6px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;font-size:14px;">
+          <input type="checkbox" id="agreeCheck" onchange="toggleSubmitActions()" style="width:auto;">
+          <span>我同意<a href="xie.html" style="color:#fc6832;">用户协议</a>和<a href="yin.html" style="color:#fc6832;">隐私政策</a></span>
+        </label>
+      </div>
+
+      <div class="tool-actions" id="submitActions" style="display:none;margin-top:16px;">
+        <button class="btn btn-primary" onclick="generateSubmitCode()">生成加密投稿文本</button>
+        <button class="btn btn-secondary" onclick="copySubmitCode()">复制文本</button>
+      </div>
+    </div>
+
+    <div class="result-box" id="submitResult"></div>
+
+    <div class="email-hint" id="submitEmailHint" style="display:none;">
+      <strong>投稿方式：</strong>请将上方生成的加密文本完整复制，发送到邮箱
+      <strong>zirui@goodemail.de5.net</strong>，邮件标题注明「投稿」。<br>
+      我们收到后会解密审核，通过后将发布到网站上。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 页脚 ==================== -->
+<div class="footer">
+  <div class="footer-title">焦梓睿的个人网站</div>
+  <div class="footer-links">
+    <a href="xie.html">用户协议</a>
+    <a href="yin.html">隐私政策</a>
+  </div>
+  <div class="footer-info">
+    QQ：19626733<br>
+    联系邮箱：zirui@goodemail.de5.net<br>
+    联系电话：13486457294<br>
+    洛谷：2101997
+  </div>
+  <div class="footer-copyright">
+    ©2026 - 焦梓睿 版权所有
+  </div>
+</div>
+
+<script src="articles.js"></script>
+<script src="zk_countdown.js"></script>
+<script>
+// ========== 侧边导航 ==========
+function toggleNav() {
+  document.getElementById('sideNav').classList.toggle('open');
+  document.getElementById('navOverlay').classList.toggle('open');
+}
+
+// ========== 路由 ==========
+function navigate(page, param) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (page === 'home') { renderHomeArticles(); initBanner(); }
+  if (page === 'articles') renderFullArticles();
+  if (page === 'article-detail') renderArticleDetail(param);
+  if (page === 'submit') initSubmit();
+}
+
+// ========== 首页文章（展示前2篇） ==========
+function renderHomeArticles() {
+  const el = document.getElementById('homeArticleList');
+  if (!window.articles || articles.length === 0) {
+    el.innerHTML = '<div class="article-empty">暂无文章</div>';
+    return;
+  }
+  el.innerHTML = articles.slice(0, 2).map((a, i) => articleCardHTML(a, i)).join('');
+}
+
+// ========== 文章分类 Tab ==========
+var currentArticleTab = 'official';
+
+function switchArticleTab(tab) {
+  currentArticleTab = tab;
+  document.querySelectorAll('.article-tab').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+  });
+  renderFullArticles();
+}
+
+// ========== 完整文章列表 ==========
+function renderFullArticles() {
+  const el = document.getElementById('fullArticleList');
+  if (!window.articles || articles.length === 0) {
+    el.innerHTML = '<div class="article-empty">还没有文章，点击右上角"写文章"开始创作吧！</div>';
+    return;
+  }
+  var keyword = '';
+  var searchEl = document.getElementById('articleSearch');
+  if (searchEl) keyword = searchEl.value.trim().toLowerCase();
+  const filtered = articles.map(function(a, i) { return { a: a, i: i }; })
+    .filter(function(item) { return (item.a.source || 'official') === currentArticleTab; })
+    .filter(function(item) {
+      if (!keyword) return true;
+      var title = (item.a.title || '').toLowerCase();
+      var content = (item.a.content || '').toLowerCase();
+      return title.indexOf(keyword) !== -1 || content.indexOf(keyword) !== -1;
+    });
+  if (filtered.length === 0) {
+    var tip;
+    if (keyword) {
+      tip = '没有找到匹配"' + keyword + '"的文章';
+    } else if (currentArticleTab === 'submission') {
+      tip = '还没有投稿文章，点击右上角"我要投稿"参与投稿吧！';
+    } else {
+      tip = '暂无官方文章';
+    }
+    el.innerHTML = '<div class="article-empty">' + tip + '</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(item) { return articleCardHTML(item.a, item.i); }).join('');
+}
+
+function getArticleTags(a) {
+  let tags = a.tags && Array.isArray(a.tags) ? a.tags.slice() : [];
+  if (a.source === 'submission' && tags.indexOf('用户投稿') === -1) {
+    tags.unshift('用户投稿');
+  }
+  if (tags.length === 0) tags.push('校园生活');
+  return tags;
+}
+
+function articleCardHTML(a, i) {
+  const summary = getExcerpt(a.content);
+  const tagsHTML = getArticleTags(a).map(function(t) { return '<span class="article-tag">' + escapeHtml(t) + '</span>'; }).join('');
+  return `
+    <div class="article-item" onclick="navigate('article-detail', ${i})">
+      <h3>${escapeHtml(a.title)}</h3>
+      <div class="summary">${summary}</div>
+      ${tagsHTML}
+    </div>
+  `;
+}
+
+function getExcerpt(md) {
+  if (!md) return '';
+  let text = md.replace(/[#*>`\[\]()!\-]/g, '').replace(/\n+/g, ' ').trim();
+  return text.substring(0, 150) + (text.length > 150 ? '...' : '');
+}
+
+// ========== 文章详情 ==========
+function renderArticleDetail(index) {
+  const a = articles[index];
+  if (!a) return;
+  const tagsHTML = getArticleTags(a).map(function(t) { return '<span class="article-tag" style="margin-right:6px;">' + escapeHtml(t) + '</span>'; }).join('');
+  const contentHtml = (typeof window.marked !== 'undefined' && window.marked && typeof window.marked.parse === 'function')
+    ? window.marked.parse(a.content || '')
+    : (window.markdownLite && typeof window.markdownLite.parse === 'function'
+      ? window.markdownLite.parse(a.content || '')
+      : '<p>文章内容无法加载</p>');
+  document.getElementById('articleDetail').innerHTML = `
+    <h1>${escapeHtml(a.title)}</h1>
+    <div class="meta">${a.date || '未标注日期'} · ${tagsHTML}</div>
+    <div class="article-body">${contentHtml}</div>
+  `;
+}
+
+// ========== 工具 ==========
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ========== 横幅轮播 ==========
+var bannerTimer = null;
+var bannerIndex = 0;
+function initBanner() {
+  var banner = document.getElementById('banner');
+  var slides = document.getElementById('bannerSlides');
+  var dots = document.getElementById('bannerDots');
+  if (!banner || !slides || !dots) return;
+  // 清除旧状态
+  if (bannerTimer) { clearInterval(bannerTimer); bannerTimer = null; }
+  slides.innerHTML = '';
+  dots.innerHTML = '';
+  bannerIndex = 0;
+
+  if (bannerEnabled !== 1 || !bannerImages || bannerImages.length === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+  banner.style.display = 'block';
+
+  // 生成幻灯片
+  bannerImages.forEach(function (src, i) {
+    var img = document.createElement('img');
+    img.className = 'banner-slide';
+    img.src = src;
+    img.alt = 'banner-' + (i + 1);
+    img.onerror = function () { this.style.display = 'none'; };
+    slides.appendChild(img);
+
+    var dot = document.createElement('div');
+    dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = function () { goToBanner(i); };
+    dots.appendChild(dot);
+  });
+
+  // 自动轮播
+  if (bannerImages.length > 1) {
+    bannerTimer = setInterval(function () {
+      goToBanner((bannerIndex + 1) % bannerImages.length);
+    }, bannerInterval || 4000);
+  }
+}
+function goToBanner(i) {
+  bannerIndex = i;
+  var slides = document.getElementById('bannerSlides');
+  var dots = document.getElementById('bannerDots');
+  if (slides) slides.style.transform = 'translateX(-' + (i * 100) + '%)';
+  if (dots) {
+    var dotEls = dots.querySelectorAll('.banner-dot');
+    dotEls.forEach(function (d, idx) { d.classList.toggle('active', idx === i); });
+  }
+}
+
+// ========== 投稿（加密走后端 API）==========
+function initSubmit() {
+  var dateEl = document.getElementById('submitDate');
+  if (dateEl && !dateEl.value) {
+    var t = new Date();
+    dateEl.value = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
+  }
+  // 重置勾选状态
+  var cb = document.getElementById('agreeCheck');
+  if (cb) cb.checked = false;
+  toggleSubmitActions();
+}
+function toggleSubmitActions() {
+  var checked = document.getElementById('agreeCheck').checked;
+  document.getElementById('submitActions').style.display = checked ? 'flex' : 'none';
+  document.getElementById('submitEmailHint').style.display = checked ? 'block' : 'none';
+  if (!checked) {
+    document.getElementById('submitResult').classList.remove('show');
+  }
+}
+function generateSubmitCode() {
+  var title = document.getElementById('submitTitle').value.trim();
+  var date = document.getElementById('submitDate').value.trim();
+  var content = document.getElementById('submitContent').value;
+  var author = document.getElementById('submitAuthor').value.trim();
+  if (!title) { alert('请填写文章标题'); return; }
+  if (!content.trim()) { alert('文章内容不能为空'); return; }
+  var box = document.getElementById('submitResult');
+  box.textContent = '正在生成加密文本...';
+  box.classList.add('show');
+  fetch('key.txt', { cache: 'no-store' }).then(function(r) {
+    if (!r.ok) throw new Error('找不到 key.txt（HTTP ' + r.status + '）');
+    return r.text();
+  }).then(function(key) {
+    key = key.trim();
+    if (!key) throw new Error('key.txt 内容为空');
+    var code = JZR.encrypt({ title: title, date: date, content: content, author: author, t: Date.now() }, key);
+    if (code) {
+      box.textContent = code;
+      box.classList.add('show');
+    }
+  }).catch(function(e) {
+    box.textContent = '生成失败：' + e.message + '（请确认 key.txt 已上传）';
+    box.classList.add('show');
+  });
+}
+function copySubmitCode() {
+  var box = document.getElementById('submitResult');
+  if (!box.classList.contains('show') || box.textContent.indexOf('JZR1:') !== 0) {
+    alert('请先生成有效的加密文本'); return;
+  }
+  navigator.clipboard.writeText(box.textContent).then(function () {
+    alert('加密文本已复制！请发送到 zirui@goodemail.de5.net');
+  }).catch(function () { alert('复制失败，请手动复制'); });
+}
+
+
+// ========== 初始化 ==========
+window.addEventListener('load', () => {
+  renderHomeArticles();
+  initBanner();
+});
+</script>
+<title>焦梓睿的个人网站</title>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>隐私政策</title>
+<link rel="icon" href="images/10001.png" type="image/png">
+<link rel="apple-touch-icon" href="images/10001.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f7f8fa;color:#333;line-height:1.65;padding:20px 16px;max-width:800px;margin:0 auto;}
+h1{font-size:22px;text-align:center;margin-bottom:24px;color:#1a1a1a;}
+h2{font-size:17px;margin:22px 0 10px;color:#222;}
+p{margin-bottom:12px;font-size:15px;color:#444;}
+ul,ol{padding-left:1.5rem;margin:0.75rem 0 1rem;}
+li{margin-bottom:0.5rem;font-size:15px;color:#444;}
+strong{font-weight:600;}
+blockquote{border-left:4px solid #cbd5e1;padding:0.75rem 1rem;background:#f1f5f9;margin:1rem 0;color:#475569;}
+.content{background:#fff;padding:24px;border-radius:12px;box-shadow:0 1px 4px #00000012;}
+.footer-note{margin-top:24px;text-align:center;font-size:13px;color:#888;}
+</style>
+</head>
+<body>
+<div class="content" id="mainContent">
+<!-- JS渲染输出内容，运营修改只改JS字符串 -->
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="markdown-lite.js"></script>
+<script>
+/* ========== 运营修改隐私政策，只编辑这个Markdown字符串 ========== */
+const MARKDOWN_CONTENT = `# 第二部分 隐私政策
+
+## 第一条 政策适用范围
+
+本隐私政策适用于所有访问、使用本网站的用户，旨在清晰告知用户本站的信息收集、使用、存储、保护规则，遵循**合法、正当、必要、最小化**原则，绝不过度收集用户个人信息。
+
+## 第二条 信息收集范围（核心）
+
+本站**仅收集用户自愿主动提交的信息，无任何自动收集、后台抓取行为**，具体收集场景如下：
+
+1、投稿场景：用户主动发送邮件投稿时，仅获取用户自愿提供的**投稿昵称、投稿文章内容**，同时获取用户发件邮箱地址（为被动接收邮件产生，用于必要的投稿沟通、稿件反馈）。
+
+2、留言场景：用户自愿填写问卷星留言问卷时，仅获取用户在问卷中**主动填写、自愿提交的信息**，具体字段以当期问卷公示内容为准。
+
+3、无其他信息收集：本站不收集用户手机号、真实姓名、住址、身份证号、设备信息、浏览记录、定位信息、通讯录等任何额外隐私信息，无注册体系，无用户数据库。
+
+4、网站运行过程中可能产生的极简服务器日志（Cloudflare 官方日志），仅用于网站安全维护、故障排查，无法关联具体用户个人身份，不会单独留存、分析、对外泄露。
+
+## 第三条 信息使用规则
+
+1、用户投稿信息：仅用于稿件审核、网站发布、投稿沟通、内容校对，不会用于营销推送、商业推广、对外售卖。
+
+2、用户留言信息：仅用于本站查看用户留言、互动回复，无其他用途。
+
+3、所有用户信息**仅用于本站服务本身**，不会超出服务范围使用，不会用于无关场景。
+
+## 第四条 信息存储与保护
+
+1、存储方式：用户投稿邮件信息留存于个人邮箱，留言信息留存于问卷星平台，本站不单独搭建数据库存储用户隐私数据。
+
+2、存储期限：用户投稿、留言信息仅保留至服务必要期限，用户可随时联系运营者申请删除个人相关留言、投稿记录。
+
+3、安全保护：本站严格遵守网络安全规范，依托正规第三方服务商保障数据安全，杜绝私自泄露、倒卖、滥用用户信息。同时提醒用户，网络环境存在固有风险，用户需自行做好个人隐私防护。
+
+## 第五条 第三方服务说明
+
+本站部分功能依托第三方平台实现，第三方平台隐私规则独立于本站：
+
+1、Cloudflare Workers：用于网站部署运行，遵循 Cloudflare 官方隐私政策；
+
+2、问卷星：用于用户留言收集，用户填写信息受问卷星隐私政策约束；
+
+3、邮箱服务商：用于接收用户投稿邮件，邮件数据受对应邮箱平台隐私政策约束。
+
+本站仅获取用户主动提交的公开留言、投稿内容，不会获取第三方平台的用户隐私数据。
+
+## 第六条 用户隐私权利
+
+1、知情权：用户可通过本政策清晰了解本站全部信息收集与使用规则；
+
+2、删除权：用户可随时联系本站运营者，申请删除本人的投稿内容、留言记录及相关展示信息；
+
+3、撤回授权：用户可随时停止投稿、留言行为，后续本站不再收集其任何信息；
+
+4、异议权：用户对本站隐私处理规则有疑问，可随时联系咨询。
+
+## 第七条 未成年人保护
+
+本网站面向全年龄段用户开放，未成年人使用本站投稿、留言服务前，需在监护人同意、指导下进行，监护人可代为行使隐私相关权利。
+`;
+
+// 渲染逻辑，请勿修改
+if (window.marked && typeof window.marked.parse === 'function') {
+    marked.setOptions({
+        gfm:true,
+        breaks:true
+    });
+    document.getElementById('mainContent').innerHTML = marked.parse(MARKDOWN_CONTENT);
+} else if (window.markdownLite && typeof window.markdownLite.parse === 'function') {
+    document.getElementById('mainContent').innerHTML = window.markdownLite.parse(MARKDOWN_CONTENT);
+} else {
+    document.getElementById('mainContent').textContent = '内容加载失败，请检查网络或脚本权限。';
+}
+</script>
+</body>
+</html>
